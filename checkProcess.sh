@@ -10,5 +10,5 @@ notify-send -t 10 -a "serverless-notify-after-command" "Serverless" "Command fin
 
 if $2;
 then
-  paplay 'notification.mp3';
+  paplay $3;
 fi;

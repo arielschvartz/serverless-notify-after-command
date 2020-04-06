@@ -1,18 +1,24 @@
 const { spawn } = require('child_process');
 const path = require('path');
+const Variables = require('serverless/lib/classes/Variables');
 
 class NotifyAfterServerlessCommand {
   constructor(serverless, options) {
     this.serverless = serverless;
-    this.options = options;
+    this.options = options || {};
+    this.vars = new Variables(serverless);
 
     this.command = serverless.processedInput.commands[0];
 
+    this.stage = this.stage.bind(this);
+    this.shouldRunCommand = this.shouldRunCommand.bind(this);
     this.beforeInitialize = this.beforeInitialize.bind(this);
 
-    if (this.shouldRunCommand) {
-      this.beforeInitialize();
-    }
+    this.shouldRunCommand().then(shouldRun => {
+      if (shouldRun) {
+        this.beforeInitialize();
+      }
+    })
   }
 
   get notifyOptions() {
@@ -20,17 +26,37 @@ class NotifyAfterServerlessCommand {
       active: true,
       blacklist: [],
       whitelist: [],
-      stages: ['development'],
+      stages: ['development', 'dev'],
       sound: true
     }, this.serverless.service.custom.notifyAfterCommand || {})
   }
 
-  get stage() {
-    return this.serverless.service.provider.stage || this.serverless.service.custom.stage || this.options.stage || 'development';
+  async stage() {
+    let s = this.serverless.service.provider.stage || this.serverless.service.custom.stage || this.options.stage || 'development';
+
+    const slsVariableRegex = /^\$\{.*\}$/g;
+
+    if (slsVariableRegex.test(s)) {
+      const parts = s.substr(2).slice(0, -1).split(',').map(s => s.trim());
+      for (const part of parts) {
+        for (let { regex, resolver } of this.serverless.variables.variableResolvers) {
+          if (regex.test(part)) {
+            s = await this.vars[resolver.name.split('bound ')[1]].apply(this, [part])
+            if (s) {
+              return s;
+            }
+          }
+        }
+      }
+    }
+
+    return s;
   }
 
-  get shouldRunCommand() {
+  async shouldRunCommand() {
     let shouldRun = this.notifyOptions.active;
+
+    const stage = await this.stage();
 
     if ((this.notifyOptions.whitelist || []).indexOf(this.command) > -1) {
       // IT'S WHITELISTED!
@@ -42,7 +68,7 @@ class NotifyAfterServerlessCommand {
       shouldRun = false;
     }
 
-    if ((this.notifyOptions.stages || []).indexOf(this.stage) === -1) {
+    if ((this.notifyOptions.stages || []).indexOf(stage) === -1) {
       // DO NOT RUN IN THIS STAGE
       shouldRun = false;
     }
@@ -66,7 +92,8 @@ class NotifyAfterServerlessCommand {
       [
         path.resolve(__dirname, './checkProcess.sh'),
         this.command,
-        this.notifyOptions.sound,
+        (process.env.SLS_NOTIFY_SOUND || '').toString().toLowerCase() === 'true' ? true : this.notifyOptions.sound,
+        path.resolve(__dirname, './message.wav')
       ], {
         detached: true,
         stdio: 'ignore',

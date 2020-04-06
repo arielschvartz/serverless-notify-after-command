@@ -51,9 +51,12 @@ custom:
 
 Besides the `serverless.yml` configuration, you can pass Environment Variables to force it to use or not. Just set the SLS_NOTIFY to true or false, if you want notifications or not.
 
+If you want to force the sound to play event when sound is false, pass the SLS_NOTIFY_SOUND=true.
+
 ``` bash
 SLS_NOTIFY=true serverless [command]
 SLS_NOTIFY=true sls [command]
+SLS_NOTIFY_SOUND=true sls [command]
 ```
 
 ## Roadmap
