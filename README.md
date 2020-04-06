@@ -32,6 +32,7 @@ plugins:
 The configuration of the plugin is done by defining a `custom: notifyAfterCommand` object in your `serverless.yml` with your specific configuration.
 
 | Attribute | Type    | Default         | Description                                   |
+|:--------- |:------- |:--------------- |:--------------------------------------------- |
 | active    | Boolean | true            | Should run or not by default                  |
 | blacklist | Array   | []              | Blacklist commands, even when active is true  |
 | whitelist | Array   | []              | Whitelist commands, even when active is false |
