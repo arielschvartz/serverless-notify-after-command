@@ -39,7 +39,10 @@ The configuration of the plugin is done by defining a `custom: notifyAfterComman
 | stages    | Array   | ['development'] | The list of stages to run                     |
 | sound     | Boolean | true            | True if a sound should be played too          |
 
-```yaml
+For the stages, important to note how the plugin infers the stage.
+It gets the --stage option, then serverless.yml custom.stage, then serverless.yml provider.stage then 'development.' The first one it finds, is the value it considers.
+
+```yaml serverless.yml
 custom:
   notifyAfterCommand:
     active: true

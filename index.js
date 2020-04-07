@@ -32,7 +32,7 @@ class NotifyAfterServerlessCommand {
   }
 
   async stage() {
-    let s = (this.serverless.service.provider || {}).stage || (this.serverless.service.custom || {}).stage || this.options.stage || 'development';
+    let s = this.options.stage || (this.serverless.service.custom || {}).stage || (this.serverless.service.provider || {}).stage || 'development';
 
     const slsVariableRegex = /^\$\{.*\}$/g;
 
