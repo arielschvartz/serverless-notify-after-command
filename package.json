@@ -1,6 +1,6 @@
 {
   "name": "serverless-notify-after-command",
-  "version": "1.1.2",
+  "version": "1.1.3",
   "description": "Simple serverless plugin to send a notification to the linux system notification handler after any command serverless command (successfull or failed)",
   "main": "index.js",
   "repository": {
