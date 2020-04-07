@@ -41,7 +41,7 @@ class NotifyAfterServerlessCommand {
       for (const part of parts) {
         for (let { regex, resolver } of this.serverless.variables.variableResolvers) {
           if (regex.test(part)) {
-            s = await this.vars[resolver.name.split('bound ')[1]].apply(this, [part])
+            s = await this.vars[resolver.name.split('bound ')[1]]([part])
             if (s) {
               return s;
             }
