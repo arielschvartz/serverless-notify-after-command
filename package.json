@@ -27,6 +27,6 @@
     "jest": "^25.2.7"
   },
   "dependencies": {
-    "serverless": "^1.48.2"
+    "serverless": "^3.25.1"
   }
 }
